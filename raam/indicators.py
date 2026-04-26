@@ -54,14 +54,13 @@ def average_relative_correlation(returns: pd.DataFrame,
     a rolling window. Returns a DataFrame indexed like `returns`.
     """
     out = pd.DataFrame(index=returns.index, columns=returns.columns, dtype=float)
-    cols = list(returns.columns)
     for i in range(window, len(returns) + 1):
         w = returns.iloc[i - window:i]
         if w.dropna(how="any").shape[0] < window // 2:
             continue
-        corr = w.corr()
-        np.fill_diagonal(corr.values, np.nan)
-        out.iloc[i - 1] = corr.mean(axis=1)
+        arr = w.corr().to_numpy(copy=True)
+        np.fill_diagonal(arr, np.nan)
+        out.iloc[i - 1] = np.nanmean(arr, axis=1)
     return out
 
 
